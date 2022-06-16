@@ -26,5 +26,7 @@ jobs:
     steps:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
+        with:
+          debug: true
 
       - run: brew test-bot --skip-recursive-dependents
