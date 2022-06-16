@@ -24,14 +24,10 @@ jobs:
         os: [ubuntu-latest, macOS-latest]
 
     steps:
-      - run: |
-          CHECKOUT_PATH=$(brew --repo "$GITHUB_REPOSITORY")
-          echo "CHECKOUT_PATH=$CHECKOUT_PATH" >> $GITHUB_ENV
-
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          path: ${{ env.CHECKOUT_PATH }}
+
+      - run: mv $(basename "$GITHUB_REPOSITORY") $(brew --repo "$GITHUB_REPOSITORY")
 
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
