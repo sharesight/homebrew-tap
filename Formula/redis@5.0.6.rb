@@ -14,7 +14,7 @@ class RedisAT506 < Formula
     inreplace "redis.conf" do |s|
       s.gsub! "/var/run/redis.pid", var/"run/redis.pid"
       s.gsub! "dir ./", "dir #{var}/db/redis/"
-      s.sub!  "/^bind .*$/", "bind 127.0.0.1 ::1"
+      s.sub!(/^bind .*$/, "bind 127.0.0.1 ::1")
     end
 
     etc.install "redis.conf"
