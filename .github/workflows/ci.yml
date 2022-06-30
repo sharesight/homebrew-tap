@@ -29,11 +29,9 @@ jobs:
 
       - run: |
           set -x
-          pwd
-          ls
-          env
-
-          ln -s $(basename "$GITHUB_WORKSPACE") $(brew --repo "$GITHUB_REPOSITORY")
+          D=$(brew --repo "$GITHUB_REPOSITORY")
+          mkdir $(basename "$D")
+          ln -s "$GITHUB_WORKSPACE" "$D"
 
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
