@@ -27,8 +27,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - run: |
-          set -x
+      - name: Move git clone where brew expects to find it
+        run: |
           D=$(brew --repo "$GITHUB_REPOSITORY")
           mkdir -p $(dirname $D)
           mv -v "$GITHUB_WORKSPACE" "$D"
@@ -39,4 +39,5 @@ jobs:
         with:
           debug: true
 
-      - run: brew test-bot --skip-recursive-dependents
+      - name: Run Homebrew tests
+        run: brew test-bot --skip-recursive-dependents
