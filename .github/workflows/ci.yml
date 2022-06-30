@@ -33,7 +33,7 @@ jobs:
           ls
           env
 
-          mv $(basename "$GITHUB_REPOSITORY") $(brew --repo "$GITHUB_REPOSITORY")
+          ln -s $(basename "$GITHUB_WORKSPACE") $(brew --repo "$GITHUB_REPOSITORY")
 
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
