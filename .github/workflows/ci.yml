@@ -30,7 +30,7 @@ jobs:
       - run: |
           set -x
           D=$(brew --repo "$GITHUB_REPOSITORY")
-          mkdir $(basename "$D")
+          mkdir -p $(dirname "$D")
           ln -s "$GITHUB_WORKSPACE" "$D"
 
       - name: Set up Homebrew
