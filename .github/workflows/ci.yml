@@ -27,12 +27,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Move git clone where brew expects to find it
-        run: |
-          D=$(brew --repo "$GITHUB_REPOSITORY")
-          mkdir -p $(dirname $D)
-          mv -v "$GITHUB_WORKSPACE" "$D"
-          mkdir -p "$GITHUB_WORKSPACE"
+      # - name: Move git clone where Homebrew expects to find it
+      #   run: |
+      #     D=$(brew --repo "$GITHUB_REPOSITORY")
+      #     mkdir -p $(dirname $D)
+      #     mv -v "$GITHUB_WORKSPACE" "$D"
+      #     mkdir -p "$GITHUB_WORKSPACE"
 
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@master
