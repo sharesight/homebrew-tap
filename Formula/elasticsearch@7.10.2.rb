@@ -76,7 +76,7 @@ class ElasticsearchAT7102 < Formula
     EOS
   end
 
-  plist_options manual: "elasticsearch"
+  # plist_options manual: "elasticsearch"
 
   def plist
     <<~EOS

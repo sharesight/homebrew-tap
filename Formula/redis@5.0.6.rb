@@ -21,7 +21,7 @@ class RedisAT506 < Formula
     etc.install "sentinel.conf" => "redis-sentinel.conf"
   end
 
-  plist_options manual: "redis-server #{HOMEBREW_PREFIX}/etc/redis.conf"
+  # plist_options manual: "redis-server #{HOMEBREW_PREFIX}/etc/redis.conf"
 
   def plist
     <<~EOS
