@@ -18,10 +18,7 @@ concurrency:
 
 jobs:
   brew-test-bot:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-11, macos-12]
+    runs-on: macOS-latest
 
     steps:
       - name: Checkout
