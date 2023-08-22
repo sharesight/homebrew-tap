@@ -76,36 +76,13 @@ class ElasticsearchAT7102 < Formula
     EOS
   end
 
-  plist_options manual: "elasticsearch"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>KeepAlive</key>
-          <false/>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/elasticsearch</string>
-          </array>
-          <key>EnvironmentVariables</key>
-          <dict>
-          </dict>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>WorkingDirectory</key>
-          <string>#{var}</string>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/elasticsearch.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/elasticsearch.log</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run opt_bin/"elasticsearch"
+    require_root false
+    working_dir var
+    log_path var/"elasticsearch.log"
+    error_log_path var/"elasticsearch.log"
+    environment_variables ES_JAVA_HOME: "/Library/Java/JavaVirtualMachines/jdk-11.0.11.jdk/Contents/Home"
   end
 
   test do

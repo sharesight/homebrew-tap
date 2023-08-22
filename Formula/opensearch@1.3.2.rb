@@ -75,7 +75,6 @@ class OpensearchAT132 < Formula
     EOS
   end
 
-  plist_options manual: "opensearch"
   service do
     run opt_bin/"opensearch"
     working_dir var
