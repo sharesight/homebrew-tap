@@ -5,7 +5,7 @@ class OpensearchAT280 < Formula
   sha256 "4ce1ab09853d58b382762093fe7804d2ddb051a420701f36c1fa2c0000496524"
   license "Apache-2.0"
 
-  depends_on "gradle" => :build
+  depends_on "gradle@8.13" => :build
   depends_on "openjdk@21"
 
   def install
