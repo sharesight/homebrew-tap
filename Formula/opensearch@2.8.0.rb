@@ -6,7 +6,7 @@ class OpensearchAT280 < Formula
   license "Apache-2.0"
 
   depends_on "gradle" => :build
-  depends_on "openjdk"
+  depends_on "openjdk@21"
 
   def install
     platform = OS.kernel_name.downcase
