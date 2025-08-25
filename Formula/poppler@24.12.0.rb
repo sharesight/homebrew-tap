@@ -58,7 +58,7 @@ class PopplerAT24120 < Formula
       -DENABLE_GLIB=ON
       -DENABLE_QT5=OFF
       -DENABLE_QT6=OFF
-      -ENABLE_GPGME=OFF
+      -DENABLE_GPGME=OFF
       -DENABLE_UNSTABLE_API_ABI_HEADERS=ON
       -DWITH_GObjectIntrospection=ON
       -DCMAKE_INSTALL_RPATH=#{rpath}
