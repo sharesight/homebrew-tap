@@ -5,7 +5,7 @@ class OpensearchAT2 < Formula
   sha256 "660eaf0958e79198c3f5483361b70a1f7618ae965955d25f2ca48ca2d113ed18"
   license "Apache-2.0"
 
-  depends_on "gradle" => :build
+  depends_on "gradle@8" => :build
   # Can be updated after https://github.com/opensearch-project/OpenSearch/pull/18085 is released.
   depends_on "openjdk@21"
 
