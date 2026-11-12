@@ -1,7 +1,7 @@
 class OpensearchAT280 < Formula
   desc "Open source distributed and RESTful search engine"
   homepage "https://github.com/opensearch-project/OpenSearch"
-  url "https://github.com/opensearch-project/OpenSearch/archive/2.8.0.tar.gz"
+  url "https://github.com/opensearch-project/OpenSearch/archive/refs/tags/2.8.0.tar.gz"
   sha256 "4ce1ab09853d58b382762093fe7804d2ddb051a420701f36c1fa2c0000496524"
   license "Apache-2.0"
 
@@ -48,20 +48,21 @@ class OpensearchAT280 < Formula
                 libexec/"bin/opensearch-keystore",
                 libexec/"bin/opensearch-plugin",
                 libexec/"bin/opensearch-shard"
-    bin.env_script_all_files(libexec/"bin", JAVA_HOME: Formula["openjdk"].opt_prefix)
-  end
+    bin.env_script_all_files(libexec/"bin", JAVA_HOME: formula_opt_prefix("openjdk"))
 
-  def post_install
-    # Make sure runtime directories exist
     (var/"lib/opensearch").mkpath
     (var/"log/opensearch").mkpath
-    ln_s etc/"opensearch", libexec/"config" unless (libexec/"config").exist?
     (var/"opensearch/plugins").mkpath
-    ln_s var/"opensearch/plugins", libexec/"plugins" unless (libexec/"plugins").exist?
     (var/"opensearch/extensions").mkpath
-    ln_s var/"opensearch/extensions", libexec/"extensions" unless (libexec/"extensions").exist?
-    # fix test not being able to create keystore because of sandbox permissions
-    system bin/"opensearch-keystore", "create" unless (etc/"opensearch/opensearch.keystore").exist?
+    libexec.install_symlink etc/"opensearch" => "config"
+    libexec.install_symlink var/"opensearch/plugins"
+    libexec.install_symlink var/"opensearch/extensions"
+  end
+
+  post_install_steps do
+    unless_path_exists "{{etc}}/opensearch/opensearch.keystore" do
+      run "opensearch-keystore", args: ["create"], base: :bin
+    end
   end
 
   def caveats

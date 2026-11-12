@@ -11,6 +11,11 @@ class PopplerAT24120 < Formula
     regex(/href=.*?poppler[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  # A custom reason rather than :versioned_formula: Homebrew auto-links versioned keg-only
+  # formulae unless a sibling version is installed, and fails to detect siblings in third-party
+  # taps, so this would still be linked over pdftohtml, pdf2image or xpdf.
+  keg_only "it conflicts with poppler, pdftohtml, pdf2image and xpdf"
+
   depends_on "cmake" => :build
   depends_on "gobject-introspection" => :build
   depends_on "pkgconf" => :build
@@ -36,9 +41,6 @@ class PopplerAT24120 < Formula
   on_macos do
     depends_on "libassuan"
   end
-
-  conflicts_with "pdftohtml", "pdf2image", "xpdf",
-    because: "poppler, pdftohtml, pdf2image, and xpdf install conflicting executables"
 
   resource "font-data" do
     url "https://poppler.freedesktop.org/poppler-data-0.4.12.tar.gz"

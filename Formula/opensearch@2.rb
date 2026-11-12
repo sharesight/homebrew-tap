@@ -57,20 +57,21 @@ class OpensearchAT2 < Formula
                 libexec/"bin/opensearch-plugin",
                 libexec/"bin/opensearch-shard"
     # Can be updated after https://github.com/opensearch-project/OpenSearch/pull/18085 is released.
-    bin.env_script_all_files(libexec/"bin", JAVA_HOME: Formula["openjdk@21"].opt_prefix)
-  end
+    bin.env_script_all_files(libexec/"bin", JAVA_HOME: formula_opt_prefix("openjdk@21"))
 
-  def post_install
-    # Make sure runtime directories exist
     (var/"lib/opensearch").mkpath
     (var/"log/opensearch").mkpath
-    ln_s etc/"opensearch", libexec/"config" unless (libexec/"config").exist?
     (var/"opensearch/plugins").mkpath
-    ln_s var/"opensearch/plugins", libexec/"plugins" unless (libexec/"plugins").exist?
     (var/"opensearch/extensions").mkpath
-    ln_s var/"opensearch/extensions", libexec/"extensions" unless (libexec/"extensions").exist?
-    # fix test not being able to create keystore because of sandbox permissions
-    system bin/"opensearch-keystore", "create" unless (etc/"opensearch/opensearch.keystore").exist?
+    libexec.install_symlink etc/"opensearch" => "config"
+    libexec.install_symlink var/"opensearch/plugins"
+    libexec.install_symlink var/"opensearch/extensions"
+  end
+
+  post_install_steps do
+    unless_path_exists "{{etc}}/opensearch/opensearch.keystore" do
+      run "opensearch-keystore", args: ["create"], base: :bin
+    end
   end
 
   def caveats
