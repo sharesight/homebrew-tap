@@ -11,6 +11,11 @@ class PopplerAT24120 < Formula
     regex(/href=.*?poppler[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  # A custom reason rather than :versioned_formula: Homebrew auto-links versioned keg-only
+  # formulae unless a sibling version is installed, and fails to detect siblings in third-party
+  # taps, so this would still be linked over pdftohtml, pdf2image or xpdf.
+  keg_only "it conflicts with poppler, pdftohtml, pdf2image and xpdf"
+
   depends_on "cmake" => :build
   depends_on "gobject-introspection" => :build
   depends_on "pkgconf" => :build
