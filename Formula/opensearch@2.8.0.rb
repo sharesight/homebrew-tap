@@ -5,6 +5,8 @@ class OpensearchAT280 < Formula
   sha256 "4ce1ab09853d58b382762093fe7804d2ddb051a420701f36c1fa2c0000496524"
   license "Apache-2.0"
 
+  keg_only :versioned_formula
+
   # Build with the vendored Gradle wrapper (8.1.1): the build scripts need Gradle 8,
   # and Gradle 8.1 cannot run on Java 21.
   depends_on "openjdk@17" => :build
