@@ -33,4 +33,4 @@ jobs:
           debug: true
 
       - name: Run Homebrew tests
-        run: brew test-bot --skip-recursive-dependents
+        run: brew test-bot
