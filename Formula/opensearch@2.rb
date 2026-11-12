@@ -20,7 +20,7 @@ class OpensearchAT2 < Formula
     # The Java formatter config fetches Eclipse components from a mirror that no longer has
     # the version it needs; use download.eclipse.org instead.
     inreplace "gradle/formatting.gradle",
-              %Q(.withP2Mirrors(Map.of("https://download.eclipse.org/", "https://mirror.umd.edu/eclipse/"))),
+              '.withP2Mirrors(Map.of("https://download.eclipse.org/", "https://mirror.umd.edu/eclipse/"))',
               ""
 
     platform = OS.kernel_name.downcase
