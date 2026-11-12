@@ -37,9 +37,6 @@ class PopplerAT24120 < Formula
     depends_on "libassuan"
   end
 
-  conflicts_with "pdftohtml", "pdf2image", "xpdf",
-    because: "poppler, pdftohtml, pdf2image, and xpdf install conflicting executables"
-
   resource "font-data" do
     url "https://poppler.freedesktop.org/poppler-data-0.4.12.tar.gz"
     sha256 "c835b640a40ce357e1b83666aabd95edffa24ddddd49b8daff63adb851cdab74"
