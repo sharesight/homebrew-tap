@@ -5,7 +5,10 @@ class OpensearchAT2 < Formula
   sha256 "660eaf0958e79198c3f5483361b70a1f7618ae965955d25f2ca48ca2d113ed18"
   license "Apache-2.0"
 
-  keg_only :versioned_formula
+  # A custom reason rather than :versioned_formula: Homebrew auto-links versioned keg-only
+  # formulae unless a sibling version is installed, and fails to detect siblings in third-party
+  # taps, so installing both OpenSearch versions would conflict on bin/opensearch.
+  keg_only "it conflicts with the other OpenSearch versions in this tap"
 
   depends_on "gradle@8" => :build
   # Can be updated after https://github.com/opensearch-project/OpenSearch/pull/18085 is released.

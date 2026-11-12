@@ -5,7 +5,10 @@ class OpensearchAT280 < Formula
   sha256 "4ce1ab09853d58b382762093fe7804d2ddb051a420701f36c1fa2c0000496524"
   license "Apache-2.0"
 
-  keg_only :versioned_formula
+  # A custom reason rather than :versioned_formula: Homebrew auto-links versioned keg-only
+  # formulae unless a sibling version is installed, and fails to detect siblings in third-party
+  # taps, so installing both OpenSearch versions would conflict on bin/opensearch.
+  keg_only "it conflicts with the other OpenSearch versions in this tap"
 
   # Build with the vendored Gradle wrapper (8.1.1): the build scripts need Gradle 8,
   # and Gradle 8.1 cannot run on Java 21.
