@@ -17,6 +17,12 @@ class OpensearchAT2 < Formula
   end
 
   def install
+    # The Java formatter config fetches Eclipse components from a mirror that no longer has
+    # the version it needs; use download.eclipse.org instead.
+    inreplace "gradle/formatting.gradle",
+              %Q(.withP2Mirrors(Map.of("https://download.eclipse.org/", "https://mirror.umd.edu/eclipse/"))),
+              ""
+
     platform = OS.kernel_name.downcase
     platform += "-arm64" if Hardware::CPU.arm?
     system "gradle", "-Dbuild.snapshot=false", ":distribution:archives:no-jdk-#{platform}-tar:assemble"

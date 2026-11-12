@@ -5,13 +5,16 @@ class OpensearchAT280 < Formula
   sha256 "4ce1ab09853d58b382762093fe7804d2ddb051a420701f36c1fa2c0000496524"
   license "Apache-2.0"
 
-  depends_on "gradle@7" => :build
+  # Build with the vendored Gradle wrapper (8.1.1): the build scripts need Gradle 8,
+  # and Gradle 8.1 cannot run on Java 21.
+  depends_on "openjdk@17" => :build
   depends_on "openjdk@21"
 
   def install
     platform = OS.kernel_name.downcase
     platform += "-arm64" if Hardware::CPU.arm?
-    system "gradle", "-Dbuild.snapshot=false", ":distribution:archives:no-jdk-#{platform}-tar:assemble"
+    ENV["JAVA_HOME"] = formula_opt_prefix("openjdk@17")
+    system "./gradlew", "-Dbuild.snapshot=false", ":distribution:archives:no-jdk-#{platform}-tar:assemble"
 
     mkdir "tar" do
       # Extract the package to the tar directory
@@ -48,7 +51,7 @@ class OpensearchAT280 < Formula
                 libexec/"bin/opensearch-keystore",
                 libexec/"bin/opensearch-plugin",
                 libexec/"bin/opensearch-shard"
-    bin.env_script_all_files(libexec/"bin", JAVA_HOME: formula_opt_prefix("openjdk"))
+    bin.env_script_all_files(libexec/"bin", JAVA_HOME: formula_opt_prefix("openjdk@21"))
 
     (var/"lib/opensearch").mkpath
     (var/"log/opensearch").mkpath
