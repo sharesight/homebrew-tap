@@ -11,7 +11,11 @@ class RedisAT626 < Formula
     regex(/href=.*?redis[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
+
+  # Fix build with recent macOS SDKs, which no longer provide stat64.
+  # Backport of https://github.com/redis/redis/commit/2f27ebb414 (Redis 6.2.14).
+  patch :DATA
 
   def install
     system "make", "install", "PREFIX=#{prefix}", "CC=#{ENV.cc}", "BUILD_TLS=yes"
@@ -39,6 +43,73 @@ class RedisAT626 < Formula
 
   test do
     system bin/"redis-server", "--test-memory", "2"
-    %w[run db/redis log].each { |p| assert_predicate var/p, :exist?, "#{var/p} doesn't exist!" }
+    %w[run db/redis log].each { |p| assert_path_exists var/p, "#{var/p} doesn't exist!" }
   end
 end
+
+__END__
+diff -ru a/src/config.h b/src/config.h
+--- a/src/config.h
++++ b/src/config.h
+@@ -39,8 +39,12 @@
+ #include <fcntl.h>
+ #endif
+ 
++#if defined(__APPLE__) && defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 1060
++#define MAC_OS_10_6_DETECTED
++#endif
++
+ /* Define redis_fstat to fstat or fstat64() */
+-#if defined(__APPLE__) && !defined(MAC_OS_X_VERSION_10_6)
++#if defined(__APPLE__) && !defined(MAC_OS_10_6_DETECTED)
+ #define redis_fstat fstat64
+ #define redis_stat stat64
+ #else
+@@ -79,7 +83,7 @@
+ #define HAVE_EPOLL 1
+ #endif
+ 
+-#if (defined(__APPLE__) && defined(MAC_OS_X_VERSION_10_6)) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined (__NetBSD__)
++#if (defined(__APPLE__) && defined(MAC_OS_10_6_DETECTED)) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined (__NetBSD__)
+ #define HAVE_KQUEUE 1
+ #endif
+ 
+@@ -248,7 +252,7 @@
+ #include <kernel/OS.h>
+ #define redis_set_thread_title(name) rename_thread(find_thread(0), name)
+ #else
+-#if (defined __APPLE__ && defined(MAC_OS_X_VERSION_10_7))
++#if (defined __APPLE__ && defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 1070)
+ int pthread_setname_np(const char *name);
+ #include <pthread.h>
+ #define redis_set_thread_title(name) pthread_setname_np(name)
+diff -ru a/src/debug.c b/src/debug.c
+--- a/src/debug.c
++++ b/src/debug.c
+@@ -1020,7 +1020,7 @@
+ 
+ #ifdef HAVE_BACKTRACE
+ static void *getMcontextEip(ucontext_t *uc) {
+-#if defined(__APPLE__) && !defined(MAC_OS_X_VERSION_10_6)
++#if defined(__APPLE__) && !defined(MAC_OS_10_6_DETECTED)
+     /* OSX < 10.6 */
+     #if defined(__x86_64__)
+     return (void*) uc->uc_mcontext->__ss.__rip;
+@@ -1029,7 +1029,7 @@
+     #else
+     return (void*) uc->uc_mcontext->__ss.__srr0;
+     #endif
+-#elif defined(__APPLE__) && defined(MAC_OS_X_VERSION_10_6)
++#elif defined(__APPLE__) && defined(MAC_OS_10_6_DETECTED)
+     /* OSX >= 10.6 */
+     #if defined(_STRUCT_X86_THREAD_STATE64) && !defined(__i386__)
+     return (void*) uc->uc_mcontext->__ss.__rip;
+@@ -1097,7 +1097,7 @@
+     serverLog(LL_WARNING|LL_RAW, "\n------ REGISTERS ------\n");
+ 
+ /* OSX */
+-#if defined(__APPLE__) && defined(MAC_OS_X_VERSION_10_6)
++#if defined(__APPLE__) && defined(MAC_OS_10_6_DETECTED)
+   /* OSX AMD64 */
+     #if defined(_STRUCT_X86_THREAD_STATE64) && !defined(__i386__)
+     serverLog(LL_WARNING,

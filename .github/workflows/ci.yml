@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 env:
@@ -21,16 +21,27 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-11, macos-12]
+        os: [macos-15, macos-26]
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Set up Homebrew
-        uses: Homebrew/actions/setup-homebrew@master
-        with:
-          debug: true
+        uses: Homebrew/actions/setup-homebrew@main
 
       - name: Run Homebrew tests
-        run: brew test-bot --skip-recursive-dependents
+        run: brew test-bot
+
+      # test-bot ignores build failures for formulae without bottles (all of this tap's),
+      # so fail the job if it reports any formula as skipped or failed.
+      - name: Check all formulae built
+        if: always()
+        run: |
+          shopt -s nullglob
+          files=(skipped_or_failed_formulae-*.txt)
+          failed=$(cat /dev/null "${files[@]}")
+          if [ -n "$failed" ]; then
+            echo "::error::Skipped or failed formulae: $failed"
+            exit 1
+          fi

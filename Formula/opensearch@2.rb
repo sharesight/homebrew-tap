@@ -5,6 +5,11 @@ class OpensearchAT2 < Formula
   sha256 "660eaf0958e79198c3f5483361b70a1f7618ae965955d25f2ca48ca2d113ed18"
   license "Apache-2.0"
 
+  # A custom reason rather than :versioned_formula: Homebrew auto-links versioned keg-only
+  # formulae unless a sibling version is installed, and fails to detect siblings in third-party
+  # taps, so installing both OpenSearch versions would conflict on bin/opensearch.
+  keg_only "it conflicts with the other OpenSearch versions in this tap"
+
   depends_on "gradle@8" => :build
   # Can be updated after https://github.com/opensearch-project/OpenSearch/pull/18085 is released.
   depends_on "openjdk@21"
@@ -17,6 +22,12 @@ class OpensearchAT2 < Formula
   end
 
   def install
+    # The Java formatter config fetches Eclipse components from a mirror that no longer has
+    # the version it needs; use download.eclipse.org instead.
+    inreplace "gradle/formatting.gradle",
+              '.withP2Mirrors(Map.of("https://download.eclipse.org/", "https://mirror.umd.edu/eclipse/"))',
+              ""
+
     platform = OS.kernel_name.downcase
     platform += "-arm64" if Hardware::CPU.arm?
     system "gradle", "-Dbuild.snapshot=false", ":distribution:archives:no-jdk-#{platform}-tar:assemble"
@@ -57,20 +68,21 @@ class OpensearchAT2 < Formula
                 libexec/"bin/opensearch-plugin",
                 libexec/"bin/opensearch-shard"
     # Can be updated after https://github.com/opensearch-project/OpenSearch/pull/18085 is released.
-    bin.env_script_all_files(libexec/"bin", JAVA_HOME: Formula["openjdk@21"].opt_prefix)
-  end
+    bin.env_script_all_files(libexec/"bin", JAVA_HOME: formula_opt_prefix("openjdk@21"))
 
-  def post_install
-    # Make sure runtime directories exist
     (var/"lib/opensearch").mkpath
     (var/"log/opensearch").mkpath
-    ln_s etc/"opensearch", libexec/"config" unless (libexec/"config").exist?
     (var/"opensearch/plugins").mkpath
-    ln_s var/"opensearch/plugins", libexec/"plugins" unless (libexec/"plugins").exist?
     (var/"opensearch/extensions").mkpath
-    ln_s var/"opensearch/extensions", libexec/"extensions" unless (libexec/"extensions").exist?
-    # fix test not being able to create keystore because of sandbox permissions
-    system bin/"opensearch-keystore", "create" unless (etc/"opensearch/opensearch.keystore").exist?
+    libexec.install_symlink etc/"opensearch" => "config"
+    libexec.install_symlink var/"opensearch/plugins"
+    libexec.install_symlink var/"opensearch/extensions"
+  end
+
+  post_install_steps do
+    unless_path_exists "{{etc}}/opensearch/opensearch.keystore" do
+      run "opensearch-keystore", args: ["create"], base: :bin
+    end
   end
 
   def caveats
