@@ -18,29 +18,30 @@ class RedisAT724 < Formula
   def install
     system "make", "install", "PREFIX=#{prefix}", "CC=#{ENV.cc}", "BUILD_TLS=yes"
 
-    %w[run db/redis log].each { |p| (var/p).mkpath }
+    # Keep config, data, pid and log files separate from the other Redis versions in this tap
+    %w[run db/redis@7.2.4 log].each { |p| (var/p).mkpath }
 
     # Fix up default conf file to match our paths
     inreplace "redis.conf" do |s|
-      s.gsub! "/var/run/redis_6379.pid", var/"run/redis.pid"
-      s.gsub! "dir ./", "dir #{var}/db/redis/"
+      s.gsub! "/var/run/redis_6379.pid", var/"run/redis@7.2.4.pid"
+      s.gsub! "dir ./", "dir #{var}/db/redis@7.2.4/"
       s.sub!(/^bind .*$/, "bind 127.0.0.1 ::1")
     end
 
-    etc.install "redis.conf"
-    etc.install "sentinel.conf" => "redis-sentinel.conf"
+    (etc/"redis@7.2.4").install "redis.conf"
+    (etc/"redis@7.2.4").install "sentinel.conf" => "redis-sentinel.conf"
   end
 
   service do
-    run [opt_bin/"redis-server", etc/"redis.conf"]
+    run [opt_bin/"redis-server", etc/"redis@7.2.4/redis.conf"]
     keep_alive true
-    error_log_path var/"log/redis.log"
-    log_path var/"log/redis.log"
+    error_log_path var/"log/redis@7.2.4.log"
+    log_path var/"log/redis@7.2.4.log"
     working_dir var
   end
 
   test do
     system bin/"redis-server", "--test-memory", "2"
-    %w[run db/redis log].each { |p| assert_path_exists var/p, "#{var/p} doesn't exist!" }
+    %w[run db/redis@7.2.4 log].each { |p| assert_path_exists var/p, "#{var/p} doesn't exist!" }
   end
 end
