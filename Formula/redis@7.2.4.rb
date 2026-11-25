@@ -42,6 +42,6 @@ class RedisAT724 < Formula
 
   test do
     system bin/"redis-server", "--test-memory", "2"
-    %w[run db/redis@7.2.4 log].each { |p| assert_path_exists var/p, "#{var/p} doesn't exist!" }
+    %w[run db/redis@7.2.4 log].each { |p| assert_path_exists var/p, "#{var}/#{p} doesn't exist!" }
   end
 end
