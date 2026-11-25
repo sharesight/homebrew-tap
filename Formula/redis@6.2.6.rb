@@ -11,6 +11,8 @@ class RedisAT626 < Formula
     regex(/href=.*?redis[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  keg_only "it conflicts with redis and the other Redis versions in this tap"
+
   depends_on "openssl@3"
 
   # Fix build with recent macOS SDKs, which no longer provide stat64.
@@ -43,7 +45,7 @@ class RedisAT626 < Formula
 
   test do
     system bin/"redis-server", "--test-memory", "2"
-    %w[run db/redis log].each { |p| assert_path_exists var/p, "#{var/p} doesn't exist!" }
+    %w[run db/redis log].each { |p| assert_path_exists var/p, "#{var}/#{p} doesn't exist!" }
   end
 end
 
